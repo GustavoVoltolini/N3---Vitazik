@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+
+model Filament {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  material     String     // ex: PLA, ABS, PETG
+  brand        String     // ex: Voolt3D
+  colorName    String     // ex: Vermelho, Preto, Azul
+  colorHex     String     // ex: #dc2626 (para renderizar a cor na UI)
+  currentWeight Float     // ex: 650
+  totalWeight   Float     // ex: 1000
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relação com as impressões (um filamento pode ser usado em várias impressões)
+  printJobs    PrintJob[]
+}
+
+// Modelo para o Histórico/Fila de Impressões
+model PrintJob {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  partName    String   // ex: Suporte de fone, Engrenagem
+  weightGrams Float    // ex: 45, 15
+  timeHours   Float    // ex: 3.5, 1.2
+  status      Status   @default(QUEUED)
+  
+  // Chave estrangeira ligando ao Filamento
+  filamentId  String   @db.ObjectId
+  filament    Filament @relation(fields: [filamentId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Enum para travar os status possíveis
+enum Status {
+  COMPLETED   // Concluída
+  PRINTING    // Imprimindo
+  QUEUED      // Na fila
+}
