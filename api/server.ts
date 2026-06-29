@@ -4,6 +4,7 @@ import "dotenv/config";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import client from "prom-client";
 
 const getSafeConnectionString = (url: string) => {
   const u = new URL(url);
@@ -27,8 +28,45 @@ const prisma = new PrismaClient({ adapter });
 
 const app = express();
 
+// --- Observabilidade: Prometheus ---
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+const httpRequestDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "Duração das requisições HTTP em segundos",
+  labelNames: ["method", "route", "status_code"],
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+  registers: [register],
+});
+
+const dbHealthGauge = new client.Gauge({
+  name: "db_connection_healthy",
+  help: "Status da conexão com o banco de dados (1=saudável, 0=falha)",
+  registers: [register],
+});
+
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const end = httpRequestDuration.startTimer();
+  res.on("finish", () => {
+    end({ method: req.method, route: req.path, status_code: res.statusCode });
+  });
+  next();
+});
+
+app.get("/metrics", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    dbHealthGauge.set(1);
+  } catch {
+    dbHealthGauge.set(0);
+  }
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
 
 app.get("/health", (req, res) => {
   res.json({ status: "Online!" });
