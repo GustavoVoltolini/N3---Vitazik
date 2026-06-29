@@ -28,15 +28,19 @@ cd N3---Vitazik
 
 npm install
 
-### 3. Iniciar a API
+### 3. Executar o comando para ler o arquivo de configuração do banco de dados (schema.prisma)
+
+npx prisma generate
+
+### 4. Iniciar a API
 
 cd api
 npx tsx watch server.ts
 
-### 4. Iniciar o Frontend
+### 5. Iniciar o Frontend
 
 npm run dev
 
-### 5. Após sucesso ao iniciar o Frontend, abrir o site local
+### 6. Após sucesso ao iniciar o Frontend, abrir o site local
 
 http://localhost:5173/
