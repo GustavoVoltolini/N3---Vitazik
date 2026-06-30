@@ -151,7 +151,7 @@ Acesse `http://localhost:9090/targets` e confirme que o target `print3d-api` est
 | Prometheus | `http://localhost:9090` |
 | Grafana | `http://localhost:3001` |
 
-Documentação da API (Swagger)
+### 1. Documentação da API (Swagger)
 
 O projeto conta com documentação interativa da API utilizando Swagger (OpenAPI 3.0).
 
