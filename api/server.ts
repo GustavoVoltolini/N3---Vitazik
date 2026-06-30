@@ -290,5 +290,33 @@ app.put("/impressoes/:id", async (req, res) => {
   }
 });
 
+app.delete("/impressoes/:id", async (req, res) => {
+  try {
+    await prisma.$transaction(async (tx) => {
+      const impressao = await tx.printJob.findUnique({
+        where: { id: req.params.id },
+      });
+
+      if (!impressao) throw new Error("PRINT_NOT_FOUND");
+
+      await tx.filament.update({
+        where: { id: impressao.filamentId },
+        data: { currentWeight: { increment: impressao.weightGrams } },
+      });
+
+      await tx.printJob.delete({ where: { id: req.params.id } });
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message === "PRINT_NOT_FOUND") {
+      return res.status(404).json({ error: "Impressão não encontrada." });
+    }
+    console.error(error);
+    res.status(500).json({ error: "Erro ao deletar impressão." });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

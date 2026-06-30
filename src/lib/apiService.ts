@@ -81,4 +81,12 @@ export const api = {
     }
     return response.json();
   },
+
+  // DELETE: Remove uma impressão e devolve o peso ao filamento
+  async deleteImpressao(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/impressoes/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar impressão");
+  },
 };

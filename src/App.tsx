@@ -190,6 +190,17 @@ export default function App() {
     resetarImpressaoForm();
   };
 
+  const handleDeletarImpressao = async (id: string) => {
+    if (confirm("Tem certeza que deseja remover esta impressão?")) {
+      try {
+        await api.deleteImpressao(id);
+        await Promise.all([carregarImpressoes(), carregarFilamentos()]);
+      } catch {
+        alert("Erro ao remover a impressão.");
+      }
+    }
+  };
+
   const handleEditarImpressao = (imp: Impressao) => {
     setEditingImpressaoId(imp.id);
     setImpressaoFormData({
@@ -479,13 +490,22 @@ export default function App() {
                           </td>
 
                           <td className="px-6 py-4 text-right">
-                            <button
-                              onClick={() => handleEditarImpressao(imp)}
-                              className="p-1.5 border border-indigo-500/30 text-indigo-400 rounded-md hover:bg-indigo-500/10 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                              title="Editar"
-                            >
-                              <Edit2 size={16} />
-                            </button>
+                            <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => handleEditarImpressao(imp)}
+                                className="p-1.5 border border-indigo-500/30 text-indigo-400 rounded-md hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                                title="Editar"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDeletarImpressao(imp.id)}
+                                className="p-1.5 border border-red-500/30 text-red-400 rounded-md hover:bg-red-500/10 transition-colors cursor-pointer"
+                                title="Excluir"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
