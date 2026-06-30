@@ -166,16 +166,20 @@ http://localhost:3000/docs
 
 A API possui os seguintes módulos documentados:
 
-🧵 Filamentos
-GET /filamentos → Lista todos os filamentos
-POST /filamentos → Cria um novo filamento
-PUT /filamentos/{id} → Atualiza um filamento existente
-DELETE /filamentos/{id} → Remove um filamento
-🖨 Impressões
-GET /impressoes → Lista todas as impressões
-POST /impressoes → Cria uma nova impressão
-PUT /impressoes/{id} → Atualiza uma impressão existente
-DELETE /impressoes/{id} → Remove uma impressão
+| Método | Endpoint           | Descrição                       |
+| ------ | ------------------ | ------------------------------- |
+| GET    | `/filamentos`      | Lista todos os filamentos       |
+| POST   | `/filamentos`      | Cria um novo filamento          |
+| PUT    | `/filamentos/{id}` | Atualiza um filamento existente |
+| DELETE | `/filamentos/{id}` | Remove um filamento             |
+
+| Método | Endpoint           | Descrição                        |
+| ------ | ------------------ | -------------------------------- |
+| GET    | `/impressoes`      | Lista todas as impressões        |
+| POST   | `/impressoes`      | Cria uma nova impressão          |
+| PUT    | `/impressoes/{id}` | Atualiza uma impressão existente |
+| DELETE | `/impressoes/{id}` | Remove uma impressão             |
+
 ⚙️ Tecnologias da documentação
 swagger-jsdoc
 swagger-ui-express
