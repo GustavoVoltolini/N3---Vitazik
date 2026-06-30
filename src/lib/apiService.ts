@@ -1,4 +1,4 @@
-import { Filamento, Impressao } from "../types";
+import type { Filamento, Impressao } from "../types";
 
 const API_URL = "http://localhost:3000";
 

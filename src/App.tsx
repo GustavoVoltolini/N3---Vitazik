@@ -4,7 +4,7 @@ import { Printer, Plus, Edit2, Trash2 } from "lucide-react";
 
 import { api } from "./lib/apiService";
 
-import { Filamento, Impressao, StatusImpressao } from "./types";
+import type { Filamento, Impressao, StatusImpressao } from "./types";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("filamentos");
