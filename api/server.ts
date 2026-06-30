@@ -5,6 +5,7 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import client from "prom-client";
+import { setupSwagger } from "./swagger";
 
 const getSafeConnectionString = (url: string) => {
   const u = new URL(url);
@@ -49,6 +50,8 @@ const dbHealthGauge = new client.Gauge({
 app.use(cors());
 app.use(express.json());
 
+setupSwagger(app);
+
 app.use((req, res, next) => {
   const end = httpRequestDuration.startTimer();
   res.on("finish", () => {
@@ -73,17 +76,70 @@ app.get("/health", (req, res) => {
 });
 
 // ROTAS DO CRUD
+/**
+ * @swagger
+ * /filamentos:
+ *   get:
+ *     summary: Lista todos os filamentos
+ *     description: Retorna uma lista de todos os filamentos cadastrados no banco de dados, ordenados pela data de criação.
+ *     responses:
+ *       200:
+ *         description: Lista de filamentos retornada com sucesso.
+ *       500:
+ *         description: Erro interno no servidor ao tentar listar os filamentos.
+ */
 app.get("/filamentos", async (req, res) => {
   try {
     const filamentos = await prisma.filament.findMany({
       orderBy: { createdAt: "asc" },
     });
+
     res.json(filamentos);
-  } catch {
+
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Erro ao listar filamentos." });
   }
 });
 
+/**
+ * @swagger
+ * /filamentos:
+ *   post:
+ *     tags: [Filamentos]
+ *     summary: Cria um novo filamento
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - material
+ *               - brand
+ *               - colorName
+ *               - colorHex
+ *               - currentWeight
+ *               - totalWeight
+ *             properties:
+ *               material:
+ *                 type: string
+ *               brand:
+ *                 type: string
+ *               colorName:
+ *                 type: string
+ *               colorHex:
+ *                 type: string
+ *               currentWeight:
+ *                 type: number
+ *               totalWeight:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Filamento criado com sucesso
+ *       500:
+ *         description: Erro ao salvar filamento
+ */
 app.post("/filamentos", async (req, res) => {
   try {
     const novoFilamento = await prisma.filament.create({
@@ -103,6 +159,43 @@ app.post("/filamentos", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /filamentos/{id}:
+ *   put:
+ *     tags: [Filamentos]
+ *     summary: Atualiza um filamento
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               material:
+ *                 type: string
+ *               brand:
+ *                 type: string
+ *               colorName:
+ *                 type: string
+ *               colorHex:
+ *                 type: string
+ *               currentWeight:
+ *                 type: number
+ *               totalWeight:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Filamento atualizado
+ *       500:
+ *         description: Erro ao atualizar
+ */
 app.put("/filamentos/:id", async (req, res) => {
   try {
     const filamentoAtualizado = await prisma.filament.update({
@@ -123,6 +216,24 @@ app.put("/filamentos/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /filamentos/{id}:
+ *   delete:
+ *     tags: [Filamentos]
+ *     summary: Remove um filamento
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Filamento removido
+ *       500:
+ *         description: Erro ao deletar
+ */
 app.delete("/filamentos/:id", async (req, res) => {
   try {
     await prisma.filament.delete({
@@ -134,6 +245,25 @@ app.delete("/filamentos/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Impressões
+ *   description: CRUD de impressões 3D
+ */
+
+/**
+ * @swagger
+ * /impressoes:
+ *   get:
+ *     tags: [Impressões]
+ *     summary: Lista todas as impressões
+ *     responses:
+ *       200:
+ *         description: Lista de impressões retornada
+ *       500:
+ *         description: Erro ao listar impressões
+ */
 app.get("/impressoes", async (req, res) => {
   try {
     const impressoes = await prisma.printJob.findMany({
@@ -146,6 +276,45 @@ app.get("/impressoes", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /impressoes:
+ *   post:
+ *     tags: [Impressões]
+ *     summary: Cria uma nova impressão
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - partName
+ *               - weightGrams
+ *               - timeHours
+ *               - status
+ *               - filamentId
+ *             properties:
+ *               partName:
+ *                 type: string
+ *               weightGrams:
+ *                 type: number
+ *               timeHours:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *               filamentId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Impressão criada
+ *       400:
+ *         description: Peso insuficiente
+ *       404:
+ *         description: Filamento não encontrado
+ *       500:
+ *         description: Erro interno
+ */
 app.post("/impressoes", async (req, res) => {
   try {
     const weightGrams = Number(req.body.weightGrams);
@@ -197,6 +366,45 @@ app.post("/impressoes", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /impressoes/{id}:
+ *   put:
+ *     tags: [Impressões]
+ *     summary: Atualiza uma impressão
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               partName:
+ *                 type: string
+ *               weightGrams:
+ *                 type: number
+ *               timeHours:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *               filamentId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Impressão atualizada
+ *       404:
+ *         description: Não encontrada
+ *       400:
+ *         description: Peso insuficiente
+ *       500:
+ *         description: Erro interno
+ */
 app.put("/impressoes/:id", async (req, res) => {
   try {
     const newWeightGrams = Number(req.body.weightGrams);
@@ -290,6 +498,26 @@ app.put("/impressoes/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /impressoes/{id}:
+ *   delete:
+ *     tags: [Impressões]
+ *     summary: Remove uma impressão
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Impressão removida
+ *       404:
+ *         description: Não encontrada
+ *       500:
+ *         description: Erro interno
+ */
 app.delete("/impressoes/:id", async (req, res) => {
   try {
     await prisma.$transaction(async (tx) => {
