@@ -150,3 +150,38 @@ Acesse `http://localhost:9090/targets` e confirme que o target `print3d-api` est
 | Métricas (raw) | `http://localhost:3000/metrics` |
 | Prometheus | `http://localhost:9090` |
 | Grafana | `http://localhost:3001` |
+
+📚 Documentação da API (Swagger)
+
+O projeto conta com documentação interativa da API utilizando Swagger (OpenAPI 3.0).
+
+A documentação permite visualizar, testar e entender todos os endpoints do sistema de forma rápida e interativa.
+
+🔗 Acesso
+
+Após iniciar a API, acesse:
+
+http://localhost:3000/docs
+📌 Funcionalidades documentadas
+
+A API possui os seguintes módulos documentados:
+
+🧵 Filamentos
+GET /filamentos → Lista todos os filamentos
+POST /filamentos → Cria um novo filamento
+PUT /filamentos/{id} → Atualiza um filamento existente
+DELETE /filamentos/{id} → Remove um filamento
+🖨 Impressões
+GET /impressoes → Lista todas as impressões
+POST /impressoes → Cria uma nova impressão
+PUT /impressoes/{id} → Atualiza uma impressão existente
+DELETE /impressoes/{id} → Remove uma impressão
+⚙️ Tecnologias da documentação
+swagger-jsdoc
+swagger-ui-express
+OpenAPI 3.0
+🧪 Como testar
+Acesse http://localhost:3000/docs
+Escolha um endpoint
+Clique em Try it out
+Execute a requisição e veja a resposta da API em tempo real
