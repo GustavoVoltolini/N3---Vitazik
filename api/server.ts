@@ -78,8 +78,16 @@ app.get("/health", (req, res) => {
 // ROTAS DO CRUD
 /**
  * @swagger
+ * tags:
+ *   name: Filamentos
+ *   description: CRUD de filamentos
+ */
+
+/**
+ * @swagger
  * /filamentos:
  *   get:
+ *     tags: [Filamentos]
  *     summary: Lista todos os filamentos
  *     description: Retorna uma lista de todos os filamentos cadastrados no banco de dados, ordenados pela data de criação.
  *     responses:
